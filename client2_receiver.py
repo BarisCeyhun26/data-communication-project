@@ -1,5 +1,4 @@
 import socket
-# Client 1'deki hesaplama fonksiyonlarını kullanır [cite: 59]
 from client1_sender import get_parity, get_2d_parity, get_crc, get_hamming, get_ip_checksum
 
 def start_receiver():
@@ -8,7 +7,7 @@ def start_receiver():
         server.listen(5)
         print("Client 2: Listening on port 9000... (Press Ctrl+C to stop)")
         
-        while True: # Sürekli dinleme döngüsü eklendi
+        while True:
             conn, _ = server.accept()
             with conn:
                 packet = conn.recv(1024).decode()

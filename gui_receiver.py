@@ -13,23 +13,19 @@ class ReceiverGUI:
         self.receiver_socket = None
         self.thread = None
         
-        # Styles
         self.label_font = ("Arial", 12, "bold")
         self.btn_font = ("Arial", 12)
         
-        # Header
         tk.Label(root, text="Receiver Status:", font=self.label_font).pack(pady=10)
         self.status_label = tk.Label(root, text="OFFLINE", font=("Arial", 14, "bold"), fg="red")
         self.status_label.pack(pady=5)
         
-        # Controls
         self.start_btn = tk.Button(root, text="Start Listening", font=self.btn_font, bg="#4CAF50", fg="white", command=self.start_receiver)
         self.start_btn.pack(pady=5, fill="x", padx=50)
         
         self.stop_btn = tk.Button(root, text="Stop Listening", font=self.btn_font, bg="#f44336", fg="white", command=self.stop_receiver, state="disabled")
         self.stop_btn.pack(pady=5, fill="x", padx=50)
         
-        # Latest Packet Info
         self.info_frame = tk.LabelFrame(root, text="Latest Packet", font=self.label_font, padx=10, pady=10)
         self.info_frame.pack(pady=20, fill="x", padx=20)
         
@@ -48,7 +44,6 @@ class ReceiverGUI:
         self.result_label = tk.Label(self.info_frame, text="STATUS: -", font=("Arial", 14, "bold"), fg="gray")
         self.result_label.pack(pady=10)
         
-        # History Log
         tk.Label(root, text="History:", font=self.label_font).pack()
         self.log_area = tk.Text(root, height=10, width=60, state='disabled', bg="#f0f0f0")
         self.log_area.pack(pady=5, padx=10)
@@ -120,7 +115,6 @@ class ReceiverGUI:
                             status_text = "DATA CORRECT" if is_correct else "DATA CORRUPTED"
                             status_color = "green" if is_correct else "red"
                             
-                            # Update GUI safely
                             self.root.after(0, self.update_display, msg, method, incoming_ctrl, calculated, status_text, status_color)
                             
                         except Exception as e:

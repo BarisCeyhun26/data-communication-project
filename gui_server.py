@@ -15,24 +15,20 @@ class ServerGUI:
         self.server_socket = None
         self.thread = None
         
-        # Styles
         self.label_font = ("Arial", 12, "bold")
         self.btn_font = ("Arial", 12)
         
-        # Header
         tk.Label(root, text="Server Status:", font=self.label_font).pack(pady=10)
         
         self.status_label = tk.Label(root, text="STOPPED", font=("Arial", 14, "bold"), fg="red")
         self.status_label.pack(pady=5)
         
-        # Controls
         self.start_btn = tk.Button(root, text="Start Server", font=self.btn_font, bg="#4CAF50", fg="white", command=self.start_server)
         self.start_btn.pack(pady=5, fill="x", padx=50)
         
         self.stop_btn = tk.Button(root, text="Stop Server", font=self.btn_font, bg="#f44336", fg="white", command=self.stop_server, state="disabled")
         self.stop_btn.pack(pady=5, fill="x", padx=50)
         
-        # Logs
         tk.Label(root, text="Activity Log:", font=self.label_font).pack(pady=10)
         self.log_area = tk.Text(root, height=20, width=60, state='disabled', bg="#f0f0f0")
         self.log_area.pack(pady=5, padx=10)
@@ -57,10 +53,8 @@ class ServerGUI:
         self.is_running = False
         self.status_label.config(text="STOPPING...", fg="orange")
         
-        # Fake connection to unblock accept() if needed or just close socket
         if self.server_socket:
             try:
-                # Force close
                 self.server_socket.close()
             except:
                 pass
@@ -73,13 +67,13 @@ class ServerGUI:
     def run_server_logic(self):
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Prevent address in use error
+            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server_socket.bind(('localhost', 8000))
             self.server_socket.listen(5)
             
             while self.is_running:
                 try:
-                    self.server_socket.settimeout(1.0) # check is_running every second
+                    self.server_socket.settimeout(1.0)
                     try:
                         conn, addr = self.server_socket.accept()
                     except socket.timeout:
@@ -92,10 +86,8 @@ class ServerGUI:
                         self.root.after(0, self.log, f"Received: {packet}")
                         
                         try:
-                            # Parse
                             if "|" in packet:
                                 data, method, control = packet.split('|')
-                                # Apply Error Logic
                                 if random.random() < 0.7:
                                     corrupted_data = apply_error(data)
                                     if corrupted_data != data:
@@ -106,7 +98,6 @@ class ServerGUI:
                                 
                                 new_packet = f"{corrupted_data}|{method}|{control}"
                                 
-                                # Forward to Client 2
                                 try:
                                     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sender:
                                         sender.connect(('localhost', 9000))

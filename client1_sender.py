@@ -1,16 +1,13 @@
 import socket
 import zlib
 
-# Metni her karakter için 8 bitlik ikili (binary) formata çevirir
 def text_to_binary(text):
     return ''.join(format(ord(c), '08b') for c in text)
 
-# Parity Bit hesaplama: Toplam '1' sayısı çift ise '0', tek ise '1' döner (Even Parity)
 def get_parity(text):
     binary = text_to_binary(text)
     return '0' if binary.count('1') % 2 == 0 else '1'
 
-# 2D Parity hesaplama: Veriyi 8 bitlik satırlara böler ve satır/sütun paritelerini birleştirir
 def get_2d_parity(text):
     row_parities = ""
     col_parities = [0] * 8
@@ -22,12 +19,10 @@ def get_2d_parity(text):
     col_result = "".join(['0' if x % 2 == 0 else '1' for x in col_parities])
     return row_parities + col_result
 
-# CRC-32 hesaplama: Polinom bölmesi sonucunda kalan değeri hex formatında döner
 def get_crc(text):
     crc = zlib.crc32(text.encode())
     return hex(crc & 0xffffffff)[2:].upper()
 
-# Hamming Code: 8 bitlik veri blokları için kontrol bitlerini (p1, p2, p4, p8) hesaplar
 def get_hamming(text):
     result_code = ""
     for char in text:
@@ -40,7 +35,6 @@ def get_hamming(text):
         result_code += f"{p1}{p2}{p4}{p8}"
     return result_code
 
-# Internet Checksum: 16 bitlik toplama ve tersini alma (1's complement) işlemi yapar
 def get_ip_checksum(text):
     data = text.encode()
     if len(data) % 2 == 1: data += b'\x00'
@@ -56,7 +50,6 @@ def start_sender():
     host = 'localhost'
     port = 8000
     
-    # Kullanıcıdan metin girişi al
     text = input("Enter the text to send: ")
     print("\n--- SELECT METHOD ---")
     print("1. Parity, 2. 2D Parity, 3. CRC, 4. Hamming, 5. Checksum")
@@ -69,7 +62,6 @@ def start_sender():
         method_name, func = methods[choice]
         control_info = func(text)
         
-        # Paket formatı: DATA|METHOD|CONTROL_INFORMATION
         packet = f"{text}|{method_name}|{control_info}"
         
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

@@ -4,14 +4,11 @@ import socket
 import time
 import random
 
-# Import logic from existing files
 from client1_sender import get_parity, get_2d_parity, get_crc, get_hamming, get_ip_checksum
 from server_corruptor import apply_error
 
 app = Flask(__name__)
 
-# --- GLOBAL STATE & LOGS ---
-# We use lists to store logs/status to display on the web page.
 LOGS = {
     "sender": [],
     "server": [],
@@ -30,7 +27,6 @@ RECEIVER_STATUS = {
 SERVER_RUNNING = False
 RECEIVER_RUNNING = False
 
-# --- THREADED SOCKET SERVERS ---
 
 def run_socket_server_node():
     """Runs the Intermediate Server (Corruptor) on Port 8000"""
@@ -55,13 +51,11 @@ def run_socket_server_node():
                 packet = conn.recv(1024).decode()
                 if not packet: continue
                 
-                # Log reception
                 LOGS["server"].append(f"Received: {packet}")
                 
                 if "|" in packet:
                     data, method, control = packet.split('|')
                     
-                    # Corruption Logic
                     if random.random() < 0.7:
                         corrupted_data = apply_error(data)
                         if corrupted_data != data:
@@ -74,7 +68,6 @@ def run_socket_server_node():
                     
                     new_packet = f"{corrupted_data}|{method}|{control}"
                     
-                    # Forward logic
                     try:
                         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sender:
                             sender.connect(('localhost', 9000))
@@ -111,7 +104,6 @@ def run_socket_receiver_node():
                 try:
                     msg, method, incoming_ctrl = packet.split('|')
                     
-                    # Verification Logic
                     calc_func = {
                         "PARITY": get_parity, 
                         "2DPARITY": get_2d_parity, 
@@ -127,7 +119,6 @@ def run_socket_receiver_node():
                     
                     is_correct = (calculated == incoming_ctrl)
                     
-                    # Update Status
                     RECEIVER_STATUS["data"] = msg
                     RECEIVER_STATUS["method"] = method
                     RECEIVER_STATUS["sent_checksum"] = incoming_ctrl
@@ -140,7 +131,6 @@ def run_socket_receiver_node():
                 except Exception as e:
                     LOGS["receiver"].append(f"Error parse: {e}")
 
-# Start background threads immediately
 t1 = threading.Thread(target=run_socket_server_node, daemon=True)
 t1.start()
 
@@ -148,7 +138,6 @@ t2 = threading.Thread(target=run_socket_receiver_node, daemon=True)
 t2.start()
 
 
-# --- FLASK ROUTES ---
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -156,19 +145,19 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket Programming Project</title>
+    <title>Data Communication Project</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
         .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
         .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
-        .log-box { background: #1e1e1e; color: #00ff00; font-family: monospace; padding: 10px; height: 300px; overflow-y: auto; border-radius: 5px; font-size: 13px; }
-        .status-box { padding: 15px; border-radius: 5px; margin-bottom: 10px; background: #eee; }
+        h2 { border-bottom: 2px solid
+        .log-box { background:
+        .status-box { padding: 15px; border-radius: 5px; margin-bottom: 10px; background:
         button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; }
-        .btn-green { background: #28a745; color: white; }
-        .btn-red { background: #dc3545; color: white; }
-        .btn-blue { background: #007bff; color: white; }
-        input[type="text"] { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn-green { background:
+        .btn-red { background:
+        .btn-blue { background:
+        input[type="text"] { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 10px; border: 1px solid
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         .status-indicator { font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; }
@@ -343,7 +332,6 @@ def api_send():
             control_info = func(text)
             packet = f"{text}|{method_name}|{control_info}"
             
-            # Send to Port 8000
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect(('localhost', 8000))
                 s.sendall(packet.encode())
@@ -368,8 +356,6 @@ def api_toggle_receiver():
 
 @app.route('/api/updates')
 def api_updates():
-    # Return logs and verify logs are cleared to avoid duplication
-    # In a real app we might use IDs, but here we just pop
     s_logs = list(LOGS["server"])
     LOGS["server"].clear()
     
@@ -385,7 +371,6 @@ def api_updates():
     })
 
 if __name__ == '__main__':
-    # Start the Flask Web Server
     print("Starting Web Interface on http://localhost:8080")
     app.run(port=8080, debug=True, use_reloader=False)
 

@@ -12,14 +12,11 @@ def main():
     
     print(f"Starting {script}...")
     try:
-        # Start Flask App
         p = subprocess.Popen([python_exe, script])
         
-        # Wait for Flask to start
         print("Waiting for server to start...")
         time.sleep(2)
         
-        # Open Browser
         print(f"Opening {url} in your browser...")
         webbrowser.open(url)
         

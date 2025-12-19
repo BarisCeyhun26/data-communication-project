@@ -1,10 +1,8 @@
 import socket
 import random
 
-# Veriye dökümandaki yöntemlerden birini kullanarak hata enjekte eder [cite: 35]
 def apply_error(text):
     if not text: return text
-    # Hata tipleri: Bit Çevirme, Karakter Değiştirme, Silme, Ekleme, Yer Değiştirme [cite: 36, 38, 40, 43, 46]
     error_type = random.choice(['BIT_FLIP', 'SUB', 'DEL', 'INS', 'SWAP'])
     
     if error_type == 'BIT_FLIP':
@@ -43,15 +41,14 @@ def apply_error(text):
     return text
 
 def start_server():
-    # listener nesnesini döngü dışında oluşturuyoruz
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.bind(('localhost', 8000))
-        listener.listen(5) # Kuyruk limitini artırdık
+        listener.listen(5)
         print("Server: Waiting for Client 1 on port 8000... (Press Ctrl+C to stop)")
         
-        while True: # Sürekli dinleme döngüsü eklendi
+        while True:
             conn, _ = listener.accept()
-            with conn: # Her bağlantı için ayrı bir blok
+            with conn:
                 packet = conn.recv(1024).decode()
                 if not packet: continue
                 
